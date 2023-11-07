@@ -10,6 +10,9 @@ const options= {
     servers:{sslCA:cert}};
 const hsts = require('./middleware/hsts');
 const { error } = require('console');
+const cors = require('cors');
+const helmet = require('helmet');
+const morgan = require('morgan');
 
 //DB
 mongoose.connect(connString)
@@ -21,13 +24,18 @@ mongoose.connect(connString)
 
 },options);
 
-//Middleware
-app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-    res.setHeader('Access-Control-Allow-Methods', '*');
-    next();
-});
+//Middleware (CORS)
+app.use(
+    cors({
+      origin: 'http://localhost:4200',
+      optionsSuccessStatus: 200
+    })
+  );
+// Use Helmet middleware for security headers
+app.use(helmet());
+// Use Morgan middleware for request logging
+app.use(morgan('combined'));
+//express
 app.use(express.json());
 app.use(hsts);
 
